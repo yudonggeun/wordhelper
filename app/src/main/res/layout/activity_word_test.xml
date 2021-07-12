@@ -25,18 +25,21 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="랜덤 테스트"
+            android:id="@+id/btnRandomtest"
             />
         <Button
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="취약 테스트"
+            android:id="@+id/btnWeektest"
             />
         <Button
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="다중 테스트"
+            android:id="@+id/btnMultitest"
             />
     </LinearLayout>
 </LinearLayout>

@@ -32,7 +32,7 @@
             android:layout_height="match_parent"
             android:gravity="center"
             android:textColor="#ffffff"
-            android:text="테스트 횟수 : n \n틀린 횟수 : n"
+            android:text="정답률 : n/m"
             />
         <Button
             android:layout_width="wrap_content"
