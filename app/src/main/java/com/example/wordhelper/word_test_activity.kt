@@ -3,31 +3,20 @@ package com.example.wordhelper
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import android.view.Gravity
-import android.view.View
-import android.view.ViewGroup
-import android.widget.FrameLayout
-import android.widget.TextView
-import android.widget.Toast
-import androidx.annotation.RequiresApi
+import androidx.core.view.get
 import kotlinx.android.synthetic.main.activity_word_test_activity.*
-import org.apache.poi.hssf.usermodel.HSSFCell
-import org.apache.poi.hssf.usermodel.HSSFRow
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import kotlinx.android.synthetic.main.activity_word_test_activity.view.*
 import org.apache.poi.openxml4j.opc.OPCPackage
-import org.apache.poi.poifs.filesystem.POIFSFileSystem
 import org.apache.poi.ss.usermodel.*
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.*
-import java.lang.Exception
-import java.nio.file.Paths
 
 class word_test_activity : AppCompatActivity() {
     lateinit var path : String
     lateinit var wordList : ArrayList<String>
     lateinit var detailList : ArrayList<ArrayList<String>>
+    lateinit var wordViewList : ArrayList<wordView>
     var size : Int = 0
     var index : Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -35,25 +24,22 @@ class word_test_activity : AppCompatActivity() {
         setContentView(R.layout.activity_word_test_activity)
         wordList = ArrayList<String>()
         detailList = ArrayList<ArrayList<String>>()
-
+        wordViewList = ArrayList<wordView>()
         path = filesDir.toString()+"/"
         fileNameView.text = "voca_bible_day1.xlsx"
         var target : String ="voca_bible_day1.xlsx"
         //readExcelFileFromAssets(path + target)
         setTestList()
-        initClickListener()
         addViewFlipper()
-        fileNameView
-
-        progressView
-
+        initClickListener()
 
         progressView.text = (index+1).toString() + "/" + size
     }
     data class SearchData(val word : String, val detail : String)
     private fun initClickListener(){
         btnShowdetail.setOnClickListener {
-            //dialog
+            var view : wordView = wordViewList[index]
+            view.switchVisible()
         }
         wordView.setOnClickListener {
             wordView.showNext()
@@ -62,18 +48,12 @@ class word_test_activity : AppCompatActivity() {
         }
     }
     private fun addViewFlipper(){
-        for(word in wordList){
-            val Textview = TextView(this)
-            val layoutParams = FrameLayout.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            layoutParams.gravity = Gravity.CENTER
-            Textview.layoutParams = layoutParams
-            Textview.gravity = Gravity.CENTER
-            Textview.text = word
-            Textview.textSize = 70f
-            wordView.addView(Textview)
+        for(index in wordList.indices){
+            val frameLayout = wordView(this)
+            frameLayout.addWord(wordList[index])
+            frameLayout.addDetail(detailList[index])
+            wordView.addView(frameLayout)
+            wordViewList.add(frameLayout)
             size++
         }
     }
