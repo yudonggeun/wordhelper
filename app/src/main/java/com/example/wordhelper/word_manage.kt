@@ -43,26 +43,20 @@ class word_manage : AppCompatActivity() {
 
         }
         btnWordDelete.setOnClickListener {
-
+            var fileName = ""
+            wordDB.execSQL("DELETE FROM fileList WHERE fileName is $fileName;")
+            wordDB.execSQL("DELETE FROM Word WHERE fileName is $fileName;")
         }
         btnEditAndView.setOnClickListener {
             var intent : Intent = Intent(applicationContext, word_view::class.java)
+            intent.putExtra("fileName", "test.xlsx")
             startActivity(intent)
         }
     }
-    inner class wordDBHelper(context: Context) : SQLiteOpenHelper(context, "groupDB", null, 1){
-        override fun onCreate(db: SQLiteDatabase?) {
-            true
-        }
-        override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-            db!!.execSQL("DROP TABLE IF EXISTS Word")
-        }
-        fun addWord(db : SQLiteDatabase?,fileName : String, word : String, detail : String){
-            db!!.execSQL("INSERT INTO Word VALUES($fileName, $word, $detail, 0, 0);")
-        }
-        fun deleteWords(db: SQLiteDatabase?, fileName : String){
-            db!!.execSQL("DELETE FROM Word WHERE fileName is $fileName;")
-        }
-
+    fun addWord(db : SQLiteDatabase?,fileName : String, word : String, detail : String){
+        db!!.execSQL("INSERT INTO Word VALUES($fileName, $word, $detail, 0, 0);")
+    }
+    fun deleteWords(db: SQLiteDatabase?, fileName : String){
+        db!!.execSQL("DELETE FROM Word WHERE fileName is $fileName;")
     }
 }
