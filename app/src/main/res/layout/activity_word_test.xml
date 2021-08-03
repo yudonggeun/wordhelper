@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="#252525"
+        android:id="@+id/wordbook"
         />
     <LinearLayout
         android:background="#303030"
@@ -38,7 +39,7 @@
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="다중 테스트"
+            android:text="선택 테스트"
             android:id="@+id/btnMultitest"
             />
     </LinearLayout>

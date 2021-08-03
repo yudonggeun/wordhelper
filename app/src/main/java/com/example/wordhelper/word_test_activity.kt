@@ -1,5 +1,6 @@
 package com.example.wordhelper
 //apache poi api를 사용하여 xls 파일을 읽는 기능
+import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -19,6 +20,7 @@ class word_test_activity : AppCompatActivity() {
     lateinit var wordViewList : ArrayList<wordView>
     var size : Int = 0
     var index : Int = 0
+    var showDetail : Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_test_activity)
@@ -26,26 +28,46 @@ class word_test_activity : AppCompatActivity() {
         detailList = ArrayList<ArrayList<String>>()
         wordViewList = ArrayList<wordView>()
         path = filesDir.toString()+"/"
-        fileNameView.text = "voca_bible_day1.xlsx"
-        var target : String ="voca_bible_day1.xlsx"
-        //readExcelFileFromAssets(path + target)
+        var target : ArrayList<String>? = intent.getStringArrayListExtra("file")//"voca_bible_day1.xlsx"
+        if(target == null || target!!.size == 0){
+            finish()
+        }
+        if(target!!.size == 1){
+            fileNameView.text = target!![0]
+        }
+        else{
+            fileNameView.text = "다중 테스트"
+        }
+
+        //readExcelFileFromAssets(path + target)//오류 해결 실패로 인한 딜레이된 함수
         setTestList()
         addViewFlipper()
         initClickListener()
-
-        progressView.text = (index+1).toString() + "/" + size
     }
     data class SearchData(val word : String, val detail : String)
     private fun initClickListener(){
         btnShowdetail.setOnClickListener {
             var view : wordView = wordViewList[index]
-            view.switchVisible()
+            if(showDetail){
+                view.showDetail()
+                btnShowdetail.text = "뜻 감추기"
+            }
+            else{
+                view.hideDetail()
+                btnShowdetail.text = "뜻 보기"
+            }
+            showDetail = showDetail xor true
         }
         wordView.setOnClickListener {
             wordView.showNext()
             index = (index+1)%size
             progressView.text = (index+1).toString() + "/" + size
+            var view : wordView = wordViewList[index]
+            view.hideDetail()
+            btnShowdetail.text = "뜻 보기"
+            showDetail = true
         }
+        progressView.text = (index+1).toString() + "/" + size
     }
     private fun addViewFlipper(){
         for(index in wordList.indices){
@@ -57,10 +79,10 @@ class word_test_activity : AppCompatActivity() {
             size++
         }
     }
-    private fun setTestList(){
+    private fun setTestList(){//삭제 예정
         var test = arrayOf("apple", "banana", "graph", "mango", "orange")
         var test_detail = arrayOf(
-            arrayOf("사과", "뉴턴의 사과", "잘못된 뜻"),
+            arrayOf("사과, 이런 저런 뜻이 있는데 이걸 알려주기 참 아쉽네", "뉴턴의 사과", "잘못된 뜻"),
             arrayOf("바나나"),
             arrayOf("포도"),
             arrayOf("망고"),

@@ -38,8 +38,8 @@ class wordView (context : Context, attr: AttributeSet? = null) : LinearLayout(co
 
     public fun addDetail(details : ArrayList<String>){
         var text : String = ""
-        for(detail in details){
-            text += detail+"\n"
+        for(index in details.indices){
+            text += "${index+1}. ${details[index]}\n"
         }
         val textView = TextView(context)
         val layoutParams = LinearLayout.LayoutParams(
@@ -48,19 +48,17 @@ class wordView (context : Context, attr: AttributeSet? = null) : LinearLayout(co
         )
         layoutParams.weight = 6f
         layoutParams.gravity = Gravity.CENTER
+        textView.visibility = View.GONE
         textView.layoutParams = layoutParams
         textView.gravity = Gravity.CENTER
         textView.textSize = 30f
         textView.text = text;
         this.addView(textView)
     }
-    public fun switchVisible(){
-        val textView = this.get(1)
-        if(textView.visibility == View.VISIBLE){
-            textView.visibility = View.GONE
-        }
-        else{
-            textView.visibility = View.VISIBLE
-        }
+    public fun showDetail(){
+        this.get(1).visibility = View.VISIBLE
+    }
+    public fun hideDetail(){
+        this.get(1).visibility = View.GONE
     }
 }

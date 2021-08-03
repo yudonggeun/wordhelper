@@ -12,6 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:background="#252525"
+        android:id="@+id/wordCorrectionList"
         />
     <LinearLayout
         android:background="#303030"
@@ -25,14 +26,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="단어장 추가"
-            android:id="@+id/btnWordadd"
+            android:id="@+id/btnWordAdd"
             />
         <Button
             android:layout_margin="5dp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="수정/보기"
-            android:id="@+id/btnEditandview"
+            android:id="@+id/btnEditAndView"
             />
         <Button
             android:layout_margin="5dp"
