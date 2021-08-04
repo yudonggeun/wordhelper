@@ -72,5 +72,4 @@ class word_view : AppCompatActivity() {
             wordViewTextView.text = "정답률 : ${testCount[index]-failCount[index]}/${testCount[index]}"
         }
     }
-
 }

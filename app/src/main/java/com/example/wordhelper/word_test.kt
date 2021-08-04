@@ -54,8 +54,10 @@ class word_test : AppCompatActivity() {
             startTest()
         }
         btnWeektest.setOnClickListener {
+            fileName = ArrayList()
+            fileName.add("weak")
             Toast.makeText(this, "비활성화 기능입니다.", Toast.LENGTH_SHORT).show()
-            //startTest()
+            startTest()
         }
         btnMultitest.setOnClickListener {
             fileName = ArrayList<String>()

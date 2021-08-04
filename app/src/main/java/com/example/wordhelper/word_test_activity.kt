@@ -6,6 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
 import androidx.core.view.get
 import kotlinx.android.synthetic.main.activity_word_test_activity.*
 import kotlinx.android.synthetic.main.activity_word_test_activity.view.*
@@ -33,20 +34,28 @@ class word_test_activity : AppCompatActivity() {
         detailList = ArrayList<ArrayList<String>>()
         wordViewList = ArrayList<wordView>()
         path = filesDir.toString()+"/"
-        var target : ArrayList<String>? = intent.getStringArrayListExtra("file")//"voca_bible_day1.xlsx"
+        var target : ArrayList<String>? = intent.getStringArrayListExtra("file")
         if(target == null || target!!.size == 0){
             finish()
         }
         if(target!!.size == 1){
             fileNameView.text = target!![0]
+            if(target[0] == "weak"){
+                fileNameView.text = "취약 테스트"
+                var standard : Float = 0.5f
+                addWord(weekCaseQuarry(standard))
+            }
         }
         else{
             fileNameView.text = "다중 테스트"
         }
         for(fileName in target){
-            addWord(fileName)
+            addWord(normalCaseQuarry(fileName))
         }
-        setTestList()
+        if(wordList.size == 0){
+            Toast.makeText(this, "테스트할 단어가 없습니다.", Toast.LENGTH_SHORT).show()
+            finish()
+        }
         addViewFlipper()
         initClickListener()
     }
@@ -84,9 +93,16 @@ class word_test_activity : AppCompatActivity() {
             size++
         }
     }
-    private fun addWord(fileName : String){
+    private fun weekCaseQuarry(standard : Float) : String{
+        return "SELECT word, detail FROM Word WHERE failCount/testCount >= $standard;"
+    }
+
+    private fun normalCaseQuarry(fileName : String) : String{
+        return "SELECT word, detail FROM Word WHERE fileName is '$fileName';"
+    }
+    private fun addWord(quarry : String){
         sqlDB = wordDBHelper.readableDatabase
-        var cursor = sqlDB.rawQuery("SELECT word, detail FROM Word WHERE fileName is '$fileName';", null)
+        var cursor = sqlDB.rawQuery(quarry, null)
         while(cursor.moveToNext()){
             var details : ArrayList<String> = ArrayList()
             wordList.add(cursor.getString(0))
