@@ -29,6 +29,11 @@ class word_view : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_view)
         wordDBHelper = wordDBHelper(this)
+        wordList = ArrayList()
+        detailList = ArrayList()
+        testCount = ArrayList()
+        failCount = ArrayList()
+
         var fileName : String? = intent.getStringExtra("fileName")
         initListener()
         addWord(fileName)
@@ -37,10 +42,6 @@ class word_view : AppCompatActivity() {
     }
     private fun addWord(fileName : String?){
         sqlDB = wordDBHelper.readableDatabase
-        wordList = ArrayList()
-        detailList = ArrayList()
-        testCount = ArrayList()
-        failCount = ArrayList()
         var cursor = sqlDB.rawQuery("SELECT word, detail, testCount, failCount FROM Word WHERE fileName is '$fileName';", null)
         size = 0;
         while(cursor.moveToNext()){

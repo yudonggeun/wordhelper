@@ -1,6 +1,8 @@
 package com.example.wordhelper
 //apache poi api를 사용하여 xls 파일을 읽는 기능
 import android.content.Intent
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -18,12 +20,15 @@ class word_test_activity : AppCompatActivity() {
     lateinit var wordList : ArrayList<String>
     lateinit var detailList : ArrayList<ArrayList<String>>
     lateinit var wordViewList : ArrayList<wordView>
+    lateinit var wordDBHelper: SQLiteOpenHelper
+    lateinit var sqlDB : SQLiteDatabase
     var size : Int = 0
     var index : Int = 0
     var showDetail : Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_test_activity)
+        wordDBHelper = wordDBHelper(this)
         wordList = ArrayList<String>()
         detailList = ArrayList<ArrayList<String>>()
         wordViewList = ArrayList<wordView>()
@@ -38,13 +43,13 @@ class word_test_activity : AppCompatActivity() {
         else{
             fileNameView.text = "다중 테스트"
         }
-
-        //readExcelFileFromAssets(path + target)//오류 해결 실패로 인한 딜레이된 함수
+        for(fileName in target){
+            addWord(fileName)
+        }
         setTestList()
         addViewFlipper()
         initClickListener()
     }
-    data class SearchData(val word : String, val detail : String)
     private fun initClickListener(){
         btnShowdetail.setOnClickListener {
             var view : wordView = wordViewList[index]
@@ -79,6 +84,16 @@ class word_test_activity : AppCompatActivity() {
             size++
         }
     }
+    private fun addWord(fileName : String){
+        sqlDB = wordDBHelper.readableDatabase
+        var cursor = sqlDB.rawQuery("SELECT word, detail FROM Word WHERE fileName is '$fileName';", null)
+        while(cursor.moveToNext()){
+            var details : ArrayList<String> = ArrayList()
+            wordList.add(cursor.getString(0))
+            details.add(cursor.getString(1))
+            detailList.add(details)
+        }
+    }
     private fun setTestList(){//삭제 예정
         var test = arrayOf("apple", "banana", "graph", "mango", "orange")
         var test_detail = arrayOf(
@@ -96,31 +111,5 @@ class word_test_activity : AppCompatActivity() {
                 detailList.get(index).add(b)
             }
         }
-    }
-    private fun readExcelFileFromAssets(path : String) {
-        val pkg = OPCPackage.open(File(path))
-        val wb : Workbook = XSSFWorkbook(pkg)
-        var sheet : Sheet = wb.getSheetAt(0)
-        for(row in sheet){
-            detailList.add(ArrayList<String>())
-            for(cell in row){
-                var cellRef : CellReference = CellReference(row.rowNum, cell.columnIndex)
-
-                when(cell.columnIndex){
-                    0 ->{//word
-                        if(cell.cellType == CellType.STRING){
-                            wordList.add(cell.stringCellValue)
-                        }
-                    }
-                    1->{//detail
-                        var detail  = detailList.get(row.rowNum)
-                        if(cell.cellType == CellType.STRING){
-                            detail.add(cell.stringCellValue)
-                        }
-                    }
-                }
-            }
-        }
-        pkg.close()
     }
 }

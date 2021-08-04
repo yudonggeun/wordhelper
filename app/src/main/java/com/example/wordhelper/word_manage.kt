@@ -31,6 +31,20 @@ class word_manage : AppCompatActivity() {
         initBtnListener()
 
     }
+
+    private fun FileList(){
+        fileList = ArrayList<String>()
+        val dirPath : String = filesDir.toString()
+        var directory : Array<out File>? = File(dirPath).listFiles()
+        for(file in directory!!){
+            if(file.isFile){
+                fileList.add(file.name)
+            }
+        }
+        var adapter : ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, fileList)
+        wordbook.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+        wordbook.adapter = adapter
+    }
     private fun addFileList(){
         fileList = ArrayList<String>()
         wordDB = dbHelper.readableDatabase
@@ -80,10 +94,5 @@ class word_manage : AppCompatActivity() {
             }
         }
     }
-    fun addWord(db : SQLiteDatabase?,fileName : String, word : String, detail : String){
-        db!!.execSQL("INSERT INTO Word VALUES($fileName, $word, $detail, 0, 0);")
-    }
-    fun deleteWords(db: SQLiteDatabase?, fileName : String){
-        db!!.execSQL("DELETE FROM Word WHERE fileName is $fileName;")
-    }
+
 }

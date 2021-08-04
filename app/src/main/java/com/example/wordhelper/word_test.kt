@@ -1,50 +1,41 @@
 package com.example.wordhelper
 
-import android.content.Context
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.SparseBooleanArray
-import android.view.DragEvent
-import android.view.View
-import android.widget.AbsListView
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import android.widget.Toast
 import androidx.core.util.size
-import androidx.core.view.iterator
-import androidx.core.view.size
 import kotlinx.android.synthetic.main.activity_word_test.*
-import java.io.File
 import kotlin.random.Random
 
 class word_test : AppCompatActivity() {
     lateinit var fileName : ArrayList<String>
     lateinit var fileList : ArrayList<String>
+    lateinit var wordDBHelper: SQLiteOpenHelper
+    lateinit var sqlDB : SQLiteDatabase
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_test)
-        addFileList()
+        wordDBHelper = wordDBHelper(this)
+        addWordFileList()
         initListener()
-
-
     }
-    private fun addFileList(){
-        fileList = ArrayList<String>()
-        val dirPath : String = filesDir.toString()
-        var directory : Array<out File>? = File(dirPath).listFiles()
-        for(file in directory!!){
-            if(file.isFile){
-                fileList.add(file.name)
-            }
+    private fun addWordFileList(){
+        fileList = ArrayList()
+        sqlDB = wordDBHelper.readableDatabase
+        var cursor = sqlDB.rawQuery("SELECT fileName FROM fileList", null)
+        while(cursor.moveToNext()){
+            fileList.add(cursor.getString(0))
         }
         var adapter : ArrayAdapter<String> = ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, fileList)
         wordbook.choiceMode = ListView.CHOICE_MODE_MULTIPLE
         wordbook.adapter = adapter
     }
-
     private fun startTest(){
         var intent : Intent = Intent(applicationContext, word_test_activity::class.java)
         intent.putStringArrayListExtra("file", fileName)
