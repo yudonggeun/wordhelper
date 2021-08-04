@@ -36,7 +36,7 @@ class wordView (context : Context, attr: AttributeSet? = null) : LinearLayout(co
         this.addView(textView)
     }
 
-    public fun addDetail(details : ArrayList<String>){
+    public fun addDetail(details: List<String>){
         var text : String = ""
         for(index in details.indices){
             text += "${index+1}. ${details[index]}\n"

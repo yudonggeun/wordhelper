@@ -1,23 +1,14 @@
 package com.example.wordhelper
 
-import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.ArrayAdapter
-import android.widget.ListView
-import android.widget.Toast
-import com.example.wordhelper.wordView
-import kotlinx.android.synthetic.main.activity_word_test.*
-import kotlinx.android.synthetic.main.activity_word_test_activity.*
-import kotlinx.android.synthetic.main.activity_word_test_activity.wordView
 import kotlinx.android.synthetic.main.activity_word_view.*
-import java.io.File
 
 class word_view : AppCompatActivity() {
     lateinit var wordList : ArrayList<String>
-    lateinit var detailList : ArrayList<ArrayList<String>>
+    lateinit var detailList : ArrayList<List<String>>
     lateinit var testCount : ArrayList<Int>
     lateinit var failCount : ArrayList<Int>
     lateinit var wordViewList : ArrayList<wordView>
@@ -40,15 +31,16 @@ class word_view : AppCompatActivity() {
         addViewFlipper()
         wordViewTextView.text = "정답률 : ${testCount[index]-failCount[index]}/${testCount[index]}"
     }
+    private fun detailToArray(details : String) : List<String> {
+        return details.split("^")
+    }
     private fun addWord(fileName : String?){
         sqlDB = wordDBHelper.readableDatabase
         var cursor = sqlDB.rawQuery("SELECT word, detail, testCount, failCount FROM Word WHERE fileName is '$fileName';", null)
         size = 0;
         while(cursor.moveToNext()){
-            var details : ArrayList<String> = ArrayList()
             wordList.add(cursor.getString(0))
-            details.add(cursor.getString(1))
-            detailList.add(details)
+            detailList.add(detailToArray(cursor.getString(1)))
             testCount.add(cursor.getInt(2))
             failCount.add(cursor.getInt(3))
         }

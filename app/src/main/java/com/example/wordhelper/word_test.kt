@@ -50,24 +50,35 @@ class word_test : AppCompatActivity() {
         }
         btnRandomtest.setOnClickListener {
             fileName = ArrayList<String>()
-            fileName.add(fileList.get(Random.nextInt(0, fileList.size)))
-            startTest()
+            if(fileList.size == 0)
+                Toast.makeText(this, "단어 리스트를 추가해주세요", Toast.LENGTH_SHORT).show()
+            else{
+                fileName.add(fileList.get(Random.nextInt(0, fileList.size)))
+                startTest()
+            }
         }
         btnWeektest.setOnClickListener {
-            fileName = ArrayList()
-            fileName.add("weak")
-            Toast.makeText(this, "비활성화 기능입니다.", Toast.LENGTH_SHORT).show()
-            startTest()
+            if(fileList.size == 0)
+                Toast.makeText(this, "단어 리스트를 추가해주세요", Toast.LENGTH_SHORT).show()
+            else {
+                fileName = ArrayList()
+                fileName.add("weak")
+                startTest()
+            }
         }
         btnMultitest.setOnClickListener {
-            fileName = ArrayList<String>()
-            var select : SparseBooleanArray = wordbook.checkedItemPositions
-            for(index in 0 .. select.size){
-                if(select[index]){
-                    fileName.add(fileList[index])
+            if(fileList.size == 0)
+                Toast.makeText(this, "단어 리스트를 추가해주세요", Toast.LENGTH_SHORT).show()
+            else {
+                fileName = ArrayList<String>()
+                var select: SparseBooleanArray = wordbook.checkedItemPositions
+                for (index in 0..select.size) {
+                    if (select[index]) {
+                        fileName.add(fileList[index])
+                    }
                 }
+                startTest()
             }
-            startTest()
         }
     }
 }
