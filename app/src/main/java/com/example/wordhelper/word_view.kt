@@ -41,8 +41,7 @@ class word_view : AppCompatActivity() {
         detailList = ArrayList()
         testCount = ArrayList()
         failCount = ArrayList()
-        var cursor = sqlDB.rawQuery("SELECT word, detail, testCount, failCount FROM Word WHERE fileName is '"
-                + fileName + "';", null)
+        var cursor = sqlDB.rawQuery("SELECT word, detail, testCount, failCount FROM Word WHERE fileName is '$fileName';", null)
         size = 0;
         while(cursor.moveToNext()){
             var details : ArrayList<String> = ArrayList()

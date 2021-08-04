@@ -7,9 +7,11 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.SparseBooleanArray
 import android.widget.ArrayAdapter
 import android.widget.ListView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.util.size
 import kotlinx.android.synthetic.main.activity_word_manage.*
 import kotlinx.android.synthetic.main.activity_word_test.*
 import java.io.File
@@ -18,7 +20,8 @@ class word_manage : AppCompatActivity() {
     lateinit var dbHelper: SQLiteOpenHelper
     lateinit var wordDB : SQLiteDatabase
     lateinit var fileList : ArrayList<String>
-
+    lateinit var adapter: ArrayAdapter<String>
+    var deleteMode : Boolean = false
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_manage)
@@ -35,7 +38,7 @@ class word_manage : AppCompatActivity() {
         while(cursor.moveToNext()){
             fileList.add(cursor.getString(0))
         }
-        var adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, fileList)
+        adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, fileList)
         wordCorrectionList.adapter = adapter
     }
     fun initBtnListener(){
@@ -43,14 +46,38 @@ class word_manage : AppCompatActivity() {
 
         }
         btnWordDelete.setOnClickListener {
-            var fileName = ""
-            wordDB.execSQL("DELETE FROM fileList WHERE fileName is $fileName;")
-            wordDB.execSQL("DELETE FROM Word WHERE fileName is $fileName;")
+            if(deleteMode) {
+                var select: SparseBooleanArray = wordCorrectionList.checkedItemPositions
+                for (index in select.size downTo 0) {
+                    if (select[index]) {
+                        wordDB.execSQL("DELETE FROM fileList WHERE fileName is '${fileList[index]}';")
+                        wordDB.execSQL("DELETE FROM Word WHERE fileName is '${fileList[index]}';")
+                        fileList.removeAt(index)
+                    }
+                }
+                adapter.notifyDataSetChanged()
+            }
         }
-        btnEditAndView.setOnClickListener {
-            var intent : Intent = Intent(applicationContext, word_view::class.java)
-            intent.putExtra("fileName", "test.xlsx")
-            startActivity(intent)
+        wordCorrectionList.setOnItemLongClickListener { parent, view, position, id ->
+            deleteMode = !deleteMode
+            if(deleteMode){
+                adapter = ArrayAdapter(this, android.R.layout.simple_list_item_multiple_choice, fileList)
+                wordCorrectionList.adapter = adapter
+                wordCorrectionList.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+            }
+            else{
+                adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, fileList)
+                wordCorrectionList.adapter = adapter
+                wordCorrectionList.choiceMode = ListView.CHOICE_MODE_NONE
+            }
+            true
+        }
+        wordCorrectionList.setOnItemClickListener { parent, view, position, id ->
+            if(!deleteMode) {
+                var intent: Intent = Intent(applicationContext, word_view::class.java)
+                intent.putExtra("fileName", fileList[position])
+                startActivity(intent)
+            }
         }
     }
     fun addWord(db : SQLiteDatabase?,fileName : String, word : String, detail : String){
