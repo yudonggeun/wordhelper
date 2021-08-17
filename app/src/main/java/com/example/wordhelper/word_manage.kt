@@ -1,5 +1,6 @@
 package com.example.wordhelper
 
+import android.content.DialogInterface
 import android.content.Intent
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
@@ -56,25 +57,24 @@ class word_manage : AppCompatActivity() {
             }
 
             var dialog = AlertDialog.Builder(this)
-            var dialogList = ListView(this)
-            var layoutParmas = FrameLayout.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            dialogList.layoutParams = layoutParmas
-            dialogList.adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1 ,candidateFileList)
-            dialogList.setOnItemClickListener { parent, view, position, id ->
-                var path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS).toString()
-                var fileName = candidateFileList[position]
-                dbHelper.addFileAtDB(fileName)
-                dbHelper.addWordListFrom(path, fileName)
-                fileList.add(fileName)
-                adapter.notifyDataSetChanged()
-            }
+            var dialogAdapter = ArrayAdapter(this, android.R.layout.simple_list_item_1 ,candidateFileList)
 
-            dialog.setView(dialogList)
             dialog.setTitle("Download")
             dialog.setPositiveButton("종료", null)
+            dialog.setAdapter(dialogAdapter) { dialogInterface: DialogInterface, position: Int ->
+                var path =
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        .toString()
+                var fileName = candidateFileList[position]
+                if (fileName !in fileList) {
+                    //다운로드 디렉토리에서 파일의 정보를 DB에 추가
+                    dbHelper.addFileAtDB(fileName)
+                    dbHelper.addWordListFrom(path, fileName)
+                    //리스트뷰에 추가된 파일의 이름을 추가 후 갱신
+                    fileList.add(fileName)
+                    adapter.notifyDataSetChanged()
+                }
+            }
             dialog.show()
         }
         btnWordDelete.setOnClickListener {
@@ -88,6 +88,11 @@ class word_manage : AppCompatActivity() {
                     }
                 }
                 adapter.notifyDataSetChanged()
+                deleteMode = !deleteMode
+                adapter = ArrayAdapter(this, android.R.layout.simple_list_item_1, fileList)
+                wordCorrectionList.adapter = adapter
+                wordCorrectionList.choiceMode = ListView.CHOICE_MODE_NONE
+                wordCorrectionList.clearChoices()
             }
         }
         wordCorrectionList.setOnItemLongClickListener { parent, view, position, id ->
