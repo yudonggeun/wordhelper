@@ -14,6 +14,7 @@ class word_test_activity : AppCompatActivity() {
     lateinit var wordViewList : ArrayList<wordView>
     lateinit var wordDBHelper: SQLiteOpenHelper
     lateinit var sqlDB : SQLiteDatabase
+    var isMovingToLeft : Boolean = true
     var size : Int = 0
     var index : Int = 0
     var showDetail : Boolean = false
@@ -21,6 +22,7 @@ class word_test_activity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_word_test_activity)
         wordDBHelper = wordDBHelper(this)
+        sqlDB = wordDBHelper.readableDatabase
         wordList = ArrayList<String>()
         detailList = ArrayList<List<String>>()
         wordViewList = ArrayList<wordView>()
@@ -62,18 +64,34 @@ class word_test_activity : AppCompatActivity() {
             }
             showDetail = showDetail xor true
         }
+        wordTestViewFlipper.setOnTouchListener { v, event ->
+            isMovingToLeft = event.x >= (v.width/2)
+            false
+        }
         wordTestViewFlipper.setOnClickListener {
-            wordTestViewFlipper.showNext()
-            index++;
-            if(index == size) {
-                Toast.makeText(this, "테스트를 완료하였습니다.", Toast.LENGTH_SHORT).show()
-                finish()
+            if(isMovingToLeft) {
+                index++;
+                if (index == size) {
+                    Toast.makeText(this, "테스트를 완료하였습니다.", Toast.LENGTH_SHORT).show()
+                    finish()
+                }
+                wordTestViewFlipper.showNext()
             }
-            progressView.text = (index%size+1).toString() + "/$size"
-            var view : wordView = wordViewList[index%size]
+            else{
+                index--;
+                if(index < 0){
+                    index = 0
+                }
+                else{
+                    wordTestViewFlipper.showPrevious()
+                }
+            }
+            progressView.text = (index % size + 1).toString() + "/$size"
+            var view: wordView = wordViewList[index % size]
             view.hideDetail()
             btnShowdetail.text = "뜻 보기"
             showDetail = true
+            true
         }
         progressView.text = "1/$size"
     }
@@ -96,7 +114,6 @@ class word_test_activity : AppCompatActivity() {
         return "SELECT word, detail, turn FROM Word WHERE fileName is '$fileName' order by word, turn;"
     }
     private fun addWord(quarry : String) {
-        sqlDB = wordDBHelper.readableDatabase
         var cursor = sqlDB.rawQuery(quarry, null)
         var detail: ArrayList<String>? = null
         while (cursor.moveToNext()) {

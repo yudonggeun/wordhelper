@@ -4,6 +4,8 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.Toast
+import kotlinx.android.synthetic.main.activity_word_test_activity.*
 import kotlinx.android.synthetic.main.activity_word_view.*
 
 class word_view : AppCompatActivity() {
@@ -14,6 +16,7 @@ class word_view : AppCompatActivity() {
     lateinit var wordViewList : ArrayList<wordView>
     lateinit var wordDBHelper: SQLiteOpenHelper
     lateinit var sqlDB : SQLiteDatabase
+    var isMovingToLeft : Boolean = true
     var size : Int = 0
     var index : Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,9 +63,27 @@ class word_view : AppCompatActivity() {
         size = wordViewList.size
     }
     private fun initListener(){
+        wordLearnView.setOnTouchListener { v, event ->
+            isMovingToLeft = event.x >= (v.width/2)
+            false
+        }
         wordLearnView.setOnClickListener {
-            wordLearnView.showNext()
-            index=(index+1)%size
+            if(isMovingToLeft) {
+                index++;
+                if (index == size) {
+                    index = 0;
+                }
+                wordLearnView.showNext()
+            }
+            else{
+                index--;
+                if(index < 0){
+                    index = size-1
+                }
+                else{
+                    wordLearnView.showPrevious()
+                }
+            }
             wordViewTextView.text = "정답률 : ${testCount[index]-failCount[index]}/${testCount[index]}"
         }
     }
