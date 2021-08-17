@@ -56,9 +56,9 @@ class wordView (context : Context, attr: AttributeSet? = null) : LinearLayout(co
         this.addView(textView)
     }
     public fun showDetail(){
-        this.get(1).visibility = View.VISIBLE
+        this[1].visibility = View.VISIBLE
     }
     public fun hideDetail(){
-        this.get(1).visibility = View.GONE
+        this[1].visibility = View.GONE
     }
 }
