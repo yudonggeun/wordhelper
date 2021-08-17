@@ -14,7 +14,14 @@ class wordDBHelper(context: Context) : SQLiteOpenHelper(context, "Word", null, 1
     override fun onCreate(db: SQLiteDatabase?) {
         database = db!!
         db!!.execSQL("Create table IF NOT EXISTS fileList(fileName CHAR(20) Primary key);")
-        db!!.execSQL("Create table IF NOT EXISTS Word(fileName CHAR(20), word CHAR(20), detail CHAR(150), testCount INTEGER, failCount INTEGER, turn INTEGER );")
+        db!!.execSQL("Create table IF NOT EXISTS Word" +
+                "(fileName CHAR(20), " +
+                "word CHAR(20), " +
+                "detail CHAR(150), " +
+                "testCount INTEGER, " +
+                "failCount INTEGER, " +
+                "turn INTEGER, " +
+                "week Boolean);")
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
@@ -43,7 +50,7 @@ class wordDBHelper(context: Context) : SQLiteOpenHelper(context, "Word", null, 1
                     detail = formatter.formatCellValue(cel)
                     turn = cel.columnIndex
 
-                    database.execSQL("INSERT INTO Word VALUES('$fileName','$word', '$detail', 0, 0, $turn)")
+                    database.execSQL("INSERT INTO Word VALUES('$fileName','$word', '$detail', 0, 0, $turn, 0)")
                 }
             }
         }
