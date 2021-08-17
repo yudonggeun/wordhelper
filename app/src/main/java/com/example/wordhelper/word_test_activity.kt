@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_word_test_activity.*
+import kotlinx.android.synthetic.main.activity_word_view.*
 
 class word_test_activity : AppCompatActivity() {
     lateinit var wordList : ArrayList<String>
@@ -61,43 +62,51 @@ class word_test_activity : AppCompatActivity() {
             }
             showDetail = showDetail xor true
         }
-        wordView.setOnClickListener {
-            wordView.showNext()
-            index = (index+1)%size
-            progressView.text = (index+1).toString() + "/" + size
-            var view : wordView = wordViewList[index]
+        wordTestViewFlipper.setOnClickListener {
+            wordTestViewFlipper.showNext()
+            index++;
+            if(index == size) {
+                Toast.makeText(this, "테스트를 완료하였습니다.", Toast.LENGTH_SHORT).show()
+                finish()
+            }
+            progressView.text = (index%size+1).toString() + "/$size"
+            var view : wordView = wordViewList[index%size]
             view.hideDetail()
             btnShowdetail.text = "뜻 보기"
             showDetail = true
         }
-        progressView.text = (index+1).toString() + "/" + size
+        progressView.text = "1/$size"
     }
     private fun addViewFlipper(){
+        wordViewList = ArrayList()
         for(index in wordList.indices){
-            val frameLayout = wordView(this)
-            frameLayout.addWord(wordList[index])
-            frameLayout.addDetail(detailList[index])
-            wordView.addView(frameLayout)
-            wordViewList.add(frameLayout)
-            size++
+            val wordView = wordView(this)
+            wordView.addWord(wordList[index])
+            wordView.addDetail(detailList[index])
+            wordTestViewFlipper.addView(wordView)
+            wordViewList.add(wordView)
         }
+        size = wordViewList.size
     }
     private fun weekCaseQuarry(standard : Float) : String{
-        return "SELECT word, detail FROM Word WHERE failCount/testCount >= $standard;"
+        return "SELECT word, detail, turn FROM Word WHERE failCount/testCount >= $standard order by word, turn;"
     }
 
     private fun normalCaseQuarry(fileName : String) : String{
-        return "SELECT word, detail FROM Word WHERE fileName is '$fileName';"
+        return "SELECT word, detail, turn FROM Word WHERE fileName is '$fileName' order by word, turn;"
     }
-    private fun detailToArray(details : String) : List<String> {
-        return details.split("^")
-    }
-    private fun addWord(quarry : String){
+    private fun addWord(quarry : String) {
         sqlDB = wordDBHelper.readableDatabase
         var cursor = sqlDB.rawQuery(quarry, null)
-        while(cursor.moveToNext()){
-            wordList.add(cursor.getString(0))
-            detailList.add(detailToArray(cursor.getString(1)))
+        var detail: ArrayList<String>? = null
+        while (cursor.moveToNext()) {
+            if (cursor.getInt(2) == 1) {
+                detail = ArrayList()
+                wordList.add(cursor.getString(0))
+                detailList.add(detail)
+            }
+            detail!!.add(cursor.getString(1))
         }
+        cursor.close()
     }
 }
