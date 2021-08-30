@@ -8,6 +8,8 @@ import org.apache.poi.ss.usermodel.DataFormatter
 import org.apache.poi.ss.util.CellReference
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import java.io.File
+import java.io.FileInputStream
+import java.io.InputStream
 
 class wordDBHelper(context: Context) : SQLiteOpenHelper(context, "Word", null, 1) {
     lateinit var database: SQLiteDatabase
@@ -31,10 +33,9 @@ class wordDBHelper(context: Context) : SQLiteOpenHelper(context, "Word", null, 1
         database.execSQL("INSERT INTO fileList VALUES('${fileName}')")
     }
     //액셀에서 한 단어의 뜻을 기제할 때 한 칸에 동일한(비슷한) 뜻을 적는다.
-    public fun addWordListFrom(path : String, fileName: String){
+    public fun addWordListFrom(stream: InputStream, fileName: String){
         var formatter = DataFormatter()
-        var file = File("$path/$fileName")
-        var workbook = XSSFWorkbook(file)
+        var workbook = XSSFWorkbook(stream)
         for(sheet in workbook){
             for(row in sheet){
                 var word : String = ""

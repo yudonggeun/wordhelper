@@ -18,7 +18,9 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         if(checkSelfPermission(android.Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED){
-            requestPermissions(arrayOf(android.Manifest.permission.READ_EXTERNAL_STORAGE), 1000)
+            requestPermissions(arrayOf(
+                android.Manifest.permission.READ_EXTERNAL_STORAGE
+            ), 1000)
         }
 
         var dbHelper = wordDBHelper(this)
